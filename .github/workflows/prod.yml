@@ -1,4 +1,4 @@
-name: Deploy to Docker Hub
+name: Docker Build & Push
 
 on:
   push:
@@ -8,13 +8,12 @@ on:
       - test
 
 jobs:
-  docker-build-and-push:
-    name: Build and Push Docker Image to Docker Hub
+  build-and-push:
     runs-on: ubuntu-latest
     environment: DOCKER
 
     steps:
-      - name: Checkout source code
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
@@ -23,20 +22,21 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PW }}
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Extract Docker image name
-        id: meta
-        run: |
-          IMAGE_NAME=api-cyntax-org
-          BRANCH_NAME=${GITHUB_REF##*/}
-          echo "image=$IMAGE_NAME" >> $GITHUB_OUTPUT
-          echo "tag=$BRANCH_NAME" >> $GITHUB_OUTPUT
+      - name: Set image tag
+        id: tag
+        run: echo "IMAGE_TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}
+          tags: your-dockerhub-username/your-image-name:${{ env.IMAGE_TAG }}
+          no-cache: true
+          provenance: false
+
+      - name: Done
+        run: echo "✅ Deployed image for branch: ${{ env.IMAGE_TAG }}"
