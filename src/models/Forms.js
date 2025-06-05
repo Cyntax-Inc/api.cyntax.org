@@ -1,12 +1,11 @@
-// Temporary in-memory store
-const submissions = [];
+const mongoose = require('mongoose');
 
-function createFormSubmission(data) {
-  submissions.push(data);
-  return data;
-}
+const formSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  message: String,
+  source: String, // e.g., client1.com
+  submittedAt: { type: Date, default: Date.now }
+});
 
-module.exports = {
-  createFormSubmission,
-  submissions
-};
+module.exports = mongoose.model('Form', formSchema);

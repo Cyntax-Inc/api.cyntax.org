@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { createUser, findUserByEmail } = require('../models/Users');
+const User = require('../models/Users'); // Mongoose model
 const logger = require('../utils/logger');
 
 const register = async (req, res) => {
@@ -15,19 +15,19 @@ const register = async (req, res) => {
     return res.status(400).json({ error: 'Name, email, and password are required' });
   }
 
-  const existingUser = findUserByEmail(email);
-  if (existingUser) {
-    logger.warn({
-      route: 'POST /auth/register',
-      status: 409,
-      reason: 'User already exists'
-    }, '❌ Registration failed - Duplicate user');
-    return res.status(409).json({ error: 'User already exists' });
-  }
-
   try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      logger.warn({
+        route: 'POST /auth/register',
+        status: 409,
+        reason: 'User already exists'
+      }, '❌ Registration failed - Duplicate user');
+      return res.status(409).json({ error: 'User already exists' });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = createUser({ name, email, password: hashedPassword, createdAt: new Date() });
+    const newUser = await User.create({ name, email, password: hashedPassword });
 
     logger.info({
       route: 'POST /auth/register',
@@ -52,39 +52,48 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
 
-  const user = findUserByEmail(email);
-  if (!user) {
-    logger.warn({
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      logger.warn({
+        route: 'POST /auth/login',
+        status: 401,
+        reason: 'User not found'
+      }, '❌ Login failed');
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      logger.warn({
+        route: 'POST /auth/login',
+        status: 401,
+        reason: 'Incorrect password'
+      }, '❌ Login failed');
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, email: user.email, name: user.name },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    logger.info({
       route: 'POST /auth/login',
-      status: 401,
-      reason: 'User not found'
-    }, '❌ Login failed');
-    return res.status(401).json({ error: 'Invalid credentials' });
-  }
+      status: 200,
+      email: user.email
+    }, '✅ Login successful');
 
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    logger.warn({
+    res.json({ token, user: { name: user.name, email: user.email } });
+  } catch (err) {
+    logger.error({
       route: 'POST /auth/login',
-      status: 401,
-      reason: 'Incorrect password'
-    }, '❌ Login failed');
-    return res.status(401).json({ error: 'Invalid credentials' });
+      status: 500,
+      error: err.message
+    }, '❌ Login error');
+    res.status(500).json({ error: 'Internal server error' });
   }
-
-  const token = jwt.sign(
-    { id: user.email, name: user.name },
-    process.env.JWT_SECRET,
-    { expiresIn: '1h' }
-  );
-
-  logger.info({
-    route: 'POST /auth/login',
-    status: 200,
-    email: user.email
-  }, '✅ Login successful');
-
-  res.json({ token, user: { name: user.name, email: user.email } });
 };
 
 module.exports = {
