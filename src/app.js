@@ -1,13 +1,17 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const requestLogger = require('./middleware/routeLogger');
+const corsOptions = require('./middleware/cors');
+
+
 
 const app = express();
 
 app.use(express.json());
+app.use(requestLogger);
 
 // CORS setup
-const corsOptions = require('./middleware/cors');
 app.use(cors(corsOptions));
 
 // Routes
