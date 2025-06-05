@@ -30,7 +30,7 @@ jobs:
       - name: Extract Docker image name
         id: meta
         run: |
-          IMAGE_NAME=cyntax-org-backend
+          IMAGE_NAME=api-cyntax-org
           BRANCH_NAME=${GITHUB_REF##*/}
           echo "image=$IMAGE_NAME" >> $GITHUB_OUTPUT
           echo "tag=$BRANCH_NAME" >> $GITHUB_OUTPUT
