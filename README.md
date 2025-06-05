@@ -135,8 +135,8 @@ api.cyntax.org/
   - `POST /api/forms` – Handles basic form submissions
   - `POST /api/tickets` – Handles ticket creation
 - Defined simple in-memory data stores via models:
-  - `FormSubmission` model
-  - `Ticket` model
+  - `Forms` model
+  - `Tickets` model
 - Implemented controllers:
   - `formController.js` – Validates and stores submitted form data
   - `ticketController.js` – Validates and stores ticket data
@@ -155,6 +155,39 @@ api.cyntax.org/
 #### 🔧 Dev Environment
 - Added `nodemon` for development reloads
 - Script: `npm run dev`
+
+
+
+### [feature/init-middleware]
+
+**Date:** 2025-06-04  
+**Status:** In Progress  
+**Scope:** Add foundational middleware for auth and CORS
+
+#### 🔐 Authentication Middleware (`auth.js`)
+- Introduced JWT-based middleware to validate `Authorization: Bearer <token>` headers
+- Middleware parses and verifies JWT using `process.env.JWT_SECRET`
+- Injects `req.user` into the request lifecycle for protected routes
+- Will serve as the entry point for expanding to OAuth flows (Google, GitHub, Facebook)
+
+#### 🌐 CORS Middleware (`cors.js`)
+- Implemented dynamic CORS setup using a whitelist from `process.env.ALLOWED_ORIGINS`
+- Supports requests from trusted domains (e.g., `caldwellfence.com`, `linvestus.com`)
+- Fallback for non-browser clients (Postman, mobile apps)
+
+#### 🔧 Application Integration
+- Registered both middlewares in `app.js`
+  - `cors(corsOptions)` for global use
+  - `auth` imported selectively in routes (`/api/tickets`)
+- Added fallback error messages for invalid or missing tokens
+- Environment variable expectations:
+  ```env
+  JWT_SECRET=your_jwt_secret
+  ALLOWED_ORIGINS=https://client1.com,https://client2.com,http://localhost:3000
+  ```
+#### ✅ Test Coverage
+- Verified form submission endpoint remains public
+- Verified ticket endpoint is protected and returns 401 without a valid token
 
 ---
 
