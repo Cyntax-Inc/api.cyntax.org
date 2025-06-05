@@ -6,7 +6,6 @@ on:
       - main
       - qa
       - test
-      - feature/github-actions-pipeline
 
 jobs:
   docker-build-and-push:
