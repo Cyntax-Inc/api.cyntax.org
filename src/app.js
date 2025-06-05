@@ -1,13 +1,19 @@
 const express = require('express');
+const cors = require('cors');
+require('dotenv').config();
+
 const app = express();
 
 app.use(express.json());
 
-// Mount all API routes
+// CORS setup
+const corsOptions = require('./middleware/cors');
+app.use(cors(corsOptions));
+
+// Routes
 const apiRoutes = require('./routes');
 app.use('/api', apiRoutes);
 
-// Default route
 app.get('/', (req, res) => {
   res.send('Cyntax API is running');
 });
