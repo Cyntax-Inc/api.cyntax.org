@@ -164,6 +164,8 @@ api.cyntax.org/
 **Status:** In Progress  
 **Scope:** Add foundational middleware for auth and CORS
 
+**Issue:** `#2`
+
 #### 🔐 Authentication Middleware (`auth.js`)
 - Introduced JWT-based middleware to validate `Authorization: Bearer <token>` headers
 - Middleware parses and verifies JWT using `process.env.JWT_SECRET`
@@ -188,6 +190,44 @@ api.cyntax.org/
 #### ✅ Test Coverage
 - Verified form submission endpoint remains public
 - Verified ticket endpoint is protected and returns 401 without a valid token
+
+
+### [feature/init-logging]
+
+**Date:** 2025-06-05  
+**Status:** Completed  
+**Scope:** Integrated structured logging using Pino
+
+**Issue:** `#8`
+
+#### 🛠️ Logger Setup
+- Created `src/utils/logger.js` to initialize a Pino instance
+- Configured logger to output raw JSON logs (no `pino-pretty`) using:
+  - ISO timestamps via `pino.stdTimeFunctions.isoTime`
+  - `level: 'info'` as default
+- Skipped pretty-print transport to ensure compatibility across environments and avoid build/runtime crashes
+
+#### 📥 Middleware Added
+- `requestLogger.js` logs every incoming request:
+  - HTTP method
+  - Request path
+  - Timestamp
+
+#### 🔄 Controllers Updated
+Integrated logging into all core controllers:
+- **`authController.js`**
+  - Logs registration and login attempts
+  - Warns on duplicate or failed logins
+- **`formController.js`**
+  - Logs incoming form submissions and validation errors
+- **`ticketController.js`**
+  - Logs ticket creation success and error states
+
+#### 🧪 Verified Behavior
+- Logs structured entries to console
+- Fully functional without `pino-pretty`
+- Ready for future integration with log collection pipelines
+
 
 ---
 
