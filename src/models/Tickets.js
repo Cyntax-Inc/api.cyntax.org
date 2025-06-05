@@ -1,11 +1,11 @@
-const tickets = [];
+const mongoose = require('mongoose');
 
-function addTicket(data) {
-  tickets.push(data);
-  return data;
-}
+const ticketSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  subject: String,
+  message: String,
+  status: { type: String, enum: ['open', 'closed'], default: 'open' },
+  createdAt: { type: Date, default: Date.now }
+});
 
-module.exports = {
-  addTicket,
-  tickets
-};
+module.exports = mongoose.model('Ticket', ticketSchema);
