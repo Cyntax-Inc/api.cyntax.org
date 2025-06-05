@@ -47,7 +47,13 @@ api.cyntax.org/
 │
 │ ├── app.js # Main Express app initialization
 │
+└── docs/
+    └── img/
+        ├── register.png
+        ├── login.png
+        └── auth_ticket.png
 ├── .env # Environment variables
+├── CHANGELOG.md 
 ├── Dockerfile # Docker image configuration
 ├── docker-compose.yml # Optional: local dev orchestration
 ├── package.json # NPM metadata and scripts
@@ -115,6 +121,10 @@ api.cyntax.org/
   createdAt: Date
 }
 ```
+
+
+---
+
 
 
 
