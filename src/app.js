@@ -4,7 +4,7 @@ const app = express();
 app.use(express.json());
 
 // Mount all API routes
-const apiRoutes = require('./routes/routes');
+const apiRoutes = require('./routes');
 app.use('/api', apiRoutes);
 
 // Default route
