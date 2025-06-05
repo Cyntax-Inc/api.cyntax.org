@@ -117,4 +117,47 @@ api.cyntax.org/
 ```
 
 
+## 📝 Changelog
+
+### [feature/init-app]
+
+**Date:** 2025-06-04  
+**Status:** Completed  
+**Scope:** Initial Application Scaffolding 
+
+**Issue:** `#1`
+
+#### 🚀 Features Added
+- Bootstrapped a Node.js + Express app with:
+  - JSON body parsing (`express.json`)
+  - Clean project structure inside `/src` directory
+- Created route definitions for:
+  - `POST /api/forms` – Handles basic form submissions
+  - `POST /api/tickets` – Handles ticket creation
+- Defined simple in-memory data stores via models:
+  - `FormSubmission` model
+  - `Ticket` model
+- Implemented controllers:
+  - `formController.js` – Validates and stores submitted form data
+  - `ticketController.js` – Validates and stores ticket data
+- Combined routes into a single `routes/index.js` file
+- Configured the root server file: `src/app.js`
+  - Mounted `/api` namespace for versionless endpoints
+  - Default health check route: `/`
+- Added basic testing and validation of schema inputs
+
+#### 📁 Directory Overview
+- `/routes` → Unified API route declarations
+- `/controllers` → Handles request logic
+- `/models` → In-memory schema + data storage
+- `app.js` → Initializes and mounts Express
+
+#### 🔧 Dev Environment
+- Added `nodemon` for development reloads
+- Script: `npm run dev`
+
+---
+
+
+
 
